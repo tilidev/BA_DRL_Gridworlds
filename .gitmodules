@@ -1,0 +1,4 @@
+[submodule "gym_minigrid"]
+	path = gym_minigrid
+	url = https://github.com/tilidev/gym_minigrid
+	branch = package_only

@@ -100,7 +100,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--env",
     help="gym environment to load",
-    default='MiniGrid-MultiRoom-N6-v0'
+    default='MiniGrid-RiskyPath-v0'
 )
 parser.add_argument(
     "--seed",
@@ -121,9 +121,35 @@ parser.add_argument(
     action='store_true'
 )
 
+# modifications by Tilio Schulze
+parser.add_argument(
+    "--spiky_active",
+    default=False,
+    help="if set, spiky tiles will be set",
+    action='store_true'
+)
+parser.add_argument(
+    "--wall_rebound",
+    default=False,
+    help="if set, the agent can rebound on walls",
+    action='store_true'
+)
+parser.add_argument(
+    "--slip_proba",
+    default=0.,
+    type=float,
+    help="sets the agent's probability of slipping"
+)
+
+
 args = parser.parse_args()
 
-env = gym.make(args.env)
+env = gym.make(
+    args.env,
+    spiky_active=args.spiky_active,
+    wall_rebound=args.wall_rebound,
+    slip_proba=args.slip_proba
+)
 
 is_RiskyPathEnv = True if "RiskyPath" in args.env else False
 

@@ -13,7 +13,7 @@
 
 - [ ] Explain how I structured my experiments and describe them
 
-The experiments can be broken down into two main phases.
+The experiments can be broken down into two main phases. </br>
 **Phase 1** consists of all experiments where the RiskyPathEnv is
 used with the `TensorObsWrapper`. When the wrapper's `step()` method is called
 by the SB3-algorithms (I use DQN and A2C), the returned observation is a
@@ -21,7 +21,7 @@ relatively low-dimensional input when compared to rgb-arrays that are
 returned in the `ImgObsWrapper`. The effect of different environment
 specifications on the learning algorithms' performance can thus be
 analyzed in a more efficient way, as learning on this kind of input drastically
-reduces complexity and computation time.
+reduces complexity and computation time. </br>
 **Phase 2** consists of all experiments where the observation is an rgb-array
 (returned by the `ImgObsWrapper`). For learning on this kind of input, the
 sb3-algorithms will use `CnnPolicy` TODO

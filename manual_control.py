@@ -7,7 +7,7 @@ import argparse
 import numpy as np
 import gym
 import gym_minigrid
-from gym_minigrid.envs.risky import RiskyPathEnv
+from gym_minigrid.envs.risky import ABSORBING_REWARD_GOAL, ABSORBING_REWARD_LAVA, ABSORBING_STATES, GOAL_REWARD, LAVA_REWARD, SPIKY_TILE_REWARD, STEP_PENALTY, RiskyPathEnv
 from gym_minigrid.wrappers import *
 from gym_minigrid.window import Window
 
@@ -140,15 +140,35 @@ parser.add_argument(
     type=float,
     help="sets the agent's probability of slipping"
 )
+parser.add_argument(
+    "--show_agent_dir",
+    default=False,
+    help="Whether or not the direction of the agent is to be shown",
+    action="store_true"
+)
 
 
 args = parser.parse_args()
+
+
+
+reward_model= {
+    STEP_PENALTY : -0.15,
+    GOAL_REWARD : 10,
+    ABSORBING_STATES : False,
+    ABSORBING_REWARD_GOAL : 0,
+    ABSORBING_REWARD_LAVA : -1,
+    SPIKY_TILE_REWARD : -0.5,
+    LAVA_REWARD : -5
+}
 
 env = gym.make(
     args.env,
     spiky_active=args.spiky_active,
     wall_rebound=args.wall_rebound,
-    slip_proba=args.slip_proba
+    slip_proba=args.slip_proba,
+    reward_spec=reward_model,
+    show_agent_dir=args.show_agent_dir
 )
 
 is_RiskyPathEnv = True if "RiskyPath" in args.env else False

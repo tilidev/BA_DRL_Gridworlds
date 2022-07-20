@@ -153,13 +153,13 @@ args = parser.parse_args()
 
 
 reward_model= {
-    STEP_PENALTY : -0.15,
-    GOAL_REWARD : 10,
+    STEP_PENALTY : 0,
+    GOAL_REWARD : 1,
     ABSORBING_STATES : False,
     ABSORBING_REWARD_GOAL : 0,
-    ABSORBING_REWARD_LAVA : -1,
-    SPIKY_TILE_REWARD : -0.5,
-    LAVA_REWARD : -5
+    ABSORBING_REWARD_LAVA : 0,
+    SPIKY_TILE_REWARD : 0,
+    LAVA_REWARD : -1
 }
 
 env = gym.make(

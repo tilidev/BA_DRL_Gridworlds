@@ -1,5 +1,7 @@
 from time import sleep
 
+from torch import device
+
 import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
 

@@ -113,10 +113,18 @@ class GridworldExperiment:
             assert isinstance(tile_size_px, int), \
                 "Render size for tiles must be set when using rgb input to cnn"
 
-        if algo.lower() == "dqn":
-            algo_config_name = self.dqn_config_name
-        elif algo.lower() == "a2c":
-            algo_config_name = self.a2c_config_name
+        try:
+            if algo.lower() == "dqn":
+                algo_config_name = self.dqn_config_name
+            elif algo.lower() == "a2c":
+                algo_config_name = self.a2c_config_name
+        except AttributeError as e:
+            print(
+                "\nWARNING: Try setting algorithm parameters with the " \
+                + "add_<a2c, dqn>_config() methods before running " \
+                + "an experiment.\n"
+            )
+            raise
 
         # define path for saving
         if save_log:
@@ -159,13 +167,13 @@ class GridworldExperiment:
                         tensorboard_log=log_directory \
                             if log_directory is not None else None
                     )
-            except (AttributeError, NameError) as e:
-                print(str(e))
+            except AttributeError as e:
                 print(
-                    "Try setting algorithm parameters with the \
-                    add_<a2c, dqn>_config() methods before running \
-                    an experiment."
+                    "\nWARNING: Try setting algorithm parameters with the " \
+                    + "add_<a2c, dqn>_config() methods before running " \
+                    + "an experiment.\n"
                 )
+                raise
 
             # learn model, save if necessary
             model.learn(
@@ -216,6 +224,6 @@ class GridworldExperiment:
 
         if len(exp_objects) > 1:
             return exp_objects
-        elif len(exp_objects) == 0:
+        elif len(exp_objects) == 1:
             return exp_objects[0]
         return None

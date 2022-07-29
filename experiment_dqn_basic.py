@@ -1,6 +1,7 @@
 from time import sleep
 
 from torch import device
+from experiment_config import GridworldExperiment
 
 import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
@@ -63,5 +64,14 @@ def one_run():
 
     model.learn(total_timesteps=250_000, tb_log_name=f"run")
 
+def test_experiment_config():
+    from experiment_config import GridworldExperiment
+    load = GridworldExperiment.load_env_json_config
+    exp : GridworldExperiment = load("env_config.json", "exp_001")
+    exp.add_a2c_config("conf_1", verbose=1)
+    exp.add_dqn_config("conf_1")
+    exp.run_experiment(2, "a2c", 90_000)
+
+
 if __name__ == "__main__":
-    one_run()
+    test_experiment_config()

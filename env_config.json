@@ -1,7 +1,7 @@
 {
     "exp_001" : {
         "max_steps" : 150,
-        "slip_probability" : 0,
+        "slip_proba" : 0,
         "wall_rebound" : false,
         "spiky_active" : false,
         "reward_spec" : {
@@ -13,10 +13,6 @@
             "risky_tile_reward" : 0,
             "lava_reward" : -1
         },
-        "show_agent_dir" : false,
-        "lava_positions" : null,
-        "agent_start_pos" : null,
-        "goal_positions" : null,
-        "spiky_positions" : null
+        "show_agent_dir" : false
     }
 }

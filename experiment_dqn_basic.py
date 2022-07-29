@@ -12,8 +12,6 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from gym_minigrid.wrappers import ImgObsWrapper, RGBImgObsWrapper, TensorObsWrapper
 
-# TODO restructure this file
-
 
 seeds = [763, 4744, 5672, 4267, 3377]
 seeds_2 = [4356, 2689, 2819, 5224, 529]
@@ -69,8 +67,12 @@ def test_experiment_config():
     load = GridworldExperiment.load_env_json_config
     exp : GridworldExperiment = load("env_config.json", "exp_001")
     exp.add_a2c_config("conf_1", verbose=1)
-    exp.add_dqn_config("conf_1")
-    exp.run_experiment(2, "a2c", 90_000)
+    exp.add_dqn_config("conf_1", verbose=1)
+    exp.run_experiment(
+        2,
+        "dqn",
+        60_000
+    )
 
 
 if __name__ == "__main__":

@@ -1,17 +1,16 @@
-# TODO structure experiment configuration (e.g. Dataclass or JSON structure)
 import json
 
 import gym
 import stable_baselines3
 from stable_baselines3 import DQN, A2C
 from stable_baselines3.common.base_class import BaseAlgorithm
+from stable_baselines3.common.monitor import Monitor
 
 import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
 from gym_minigrid.envs.risky import DEFAULT_REWARDS
 from gym_minigrid.wrappers import ImgObsWrapper, RGBImgObsWrapper, TensorObsWrapper
 
-# Logik: benutze Gri
 
 class GridworldExperiment:
     SEEDS = (763, 4744, 5672, 4267, 3377, 4356, 2689, 2819, 5224, 529)
@@ -34,10 +33,10 @@ class GridworldExperiment:
             spiky_active (bool): whether spiky tiles should be active
             reward_spec (dict): the dictionary containing the reward model
             show_agent_dir (bool): only relevant for rgb_array observation
-            lava_positions (list[tuple], optional): specify the lava positions
+            lava_positions (list[tuple]): specify the lava positions
             agent_start_pos (tuple): the agent's starting position
             goal_positions (list[tuple]): specify the goal positions
-            spiky_positions (list[tuple], optional): the spiky tile positions
+            spiky_positions (list[tuple]): the spiky tile positions
         """
         self.experiment_id = exp_id
 
@@ -148,6 +147,7 @@ class GridworldExperiment:
             elif observation_type.lower() == "rgb_array":
                 env = RGBImgObsWrapper(env, tile_size=tile_size_px)
                 env = ImgObsWrapper(env)
+            # env = Monitor(env, info_keywords=("is_success",))
 
             # initialize model
             try:

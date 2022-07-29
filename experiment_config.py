@@ -19,16 +19,7 @@ class GridworldExperiment:
     def __init__(
         self,
         exp_id: str,
-        max_steps: int = 150,
-        slip_probability: float = 0.,
-        wall_rebound: bool = False,
-        spiky_active: bool = False,
-        reward_spec: dict = DEFAULT_REWARDS,
-        show_agent_dir: bool = False,
-        lava_positions: list[tuple] = None,
-        agent_start_pos: tuple = (2,9),
-        goal_positions: list[tuple] = [(1,3)],
-        spiky_positions: list[tuple] = None
+        **kwargs
     ):
         """Initialize the experiment with environment-specific
         information. Algorithm configuration is seperate from the object
@@ -51,25 +42,7 @@ class GridworldExperiment:
         self.experiment_id = exp_id
 
         # environment spec
-        self.max_steps = max_steps
-        self.slip_proba = slip_probability
-        self.wall_rebound = wall_rebound
-        self.spiky_active = spiky_active
-        self.reward_spec = reward_spec
-        self.show_agent_dir = show_agent_dir
-        self.agent_start_pos = agent_start_pos
-        self.goal_positions = goal_positions
-        self.agent_start_pos = agent_start_pos
-        self.goal_positions = goal_positions
-        self.lava_positions = lava_positions
-        self.spiky_positions = spiky_positions
-
-        # if observation_type == "tensor":
-        #     env = TensorObsWrapper(env)
-        # elif observation_type == "rgb_array":
-        #     env = RGBImgObsWrapper(env, self.tile_size_px)
-        #     env = ImgObsWrapper(env)
-        # self.env = env
+        self.env_kwargs = kwargs
 
     def add_dqn_config(
         self,
@@ -97,17 +70,34 @@ class GridworldExperiment:
         self,
         num_runs: int,
         algo: str,
+        total_timesteps: int,
         observation_type : str = "tensor",
+        policy_type : str = "MlpPolicy",
         tile_size_px: int = None,
         save_log: bool = True,
         log_directory: str = "saved_logs/",
         save_model: bool = True,
         model_directory: str = "saved_models/"
     ):
-        # TODO handle model creation & deletion (memory saving) here
-        # TODO handle environment creation, wrapping & deletion here
-        # Model will need created environment when initialized
-        # TODO write seed at the end of the log name
+        """Run the experiment with preset algorithm configurations for a
+        certain number of runs. The path to the saved log and model are
+        automatically generated. Each individual run is saved in the folder
+        corresponding folder structure and is saved with the seed in the
+        filename for purposes of reproducibility.
+
+        Args:
+            num_runs (int): Number of runs, should be maximally 10.
+            algo (str): Either 'dqn' or 'a2c'
+            total_timesteps (int): Number of timesteps to learn for each run
+            observation_type (str, optional): Either 'tensor' or 'rgb_array'
+            policy_type (str, optional): Either 'MlpPolicy' or 'CnnPolicy'
+            tile_size_px (int, optional): Set this render size for cnn policy
+            save_log (bool, optional): Whether to save a tensorboard log
+            log_directory (str, optional): The log folder (e.g. "saved_logs/")
+            save_model (bool, optional): Whether to save the trained model
+            model_directory (str, optional): The model folder ("saved_models/")
+        """    
+
 
         # basic consistency checks
         assert num_runs <= len(self.SEEDS), \
@@ -116,32 +106,83 @@ class GridworldExperiment:
             "Must use one of the algorithms 'a2c' or 'dqn'"
         assert observation_type.lower() in ["tensor", "rgb_array"], \
             "Observations must conform to 'tensor' or 'rgb_array'"
+        assert policy_type in ["MlpPolicy", "CnnPolicy"], \
+            "policy_type must conform to types defined by stable baselines 3"
+        if policy_type == "CnnPolicy" \
+        and observation_type.lower() == "rgb_array":
+            assert isinstance(tile_size_px, int), \
+                "Render size for tiles must be set when using rgb input to cnn"
 
         if algo.lower() == "dqn":
             algo_config_name = self.dqn_config_name
         elif algo.lower() == "a2c":
             algo_config_name = self.a2c_config_name
 
-        # define path for saving 
-        obs_type_path = "tensor_obs/" if observation_type == "tensor" \
-             else f"pixel_obs_{tile_size_px}/"
-        full_path_suffix = \
-            self.experiment_id + "/" + obs_type_path + algo.lower() + \
-            "/" + algo_config_name + "/"
+        # define path for saving
+        if save_log:
+            obs_type_path = "tensor_obs/" if observation_type == "tensor" \
+                else f"pixel_obs_{tile_size_px}/"
+            full_path_suffix = \
+                self.experiment_id + "/" + obs_type_path + algo.lower() + \
+                "/" + algo_config_name + "/"
 
-        # make environment
-        env = gym.make(
-            "MiniGrid-RiskyPath-v0",
-            
-        )
+        for i in range(num_runs):
 
+            # make environment
+            env = gym.make(
+                "MiniGrid-RiskyPath-v0",
+                **self.env_kwargs
+            )
 
-        # initialize model
+            # wrap environment according to observation type
+            if observation_type.lower() == "tensor":
+                env = TensorObsWrapper(env)
+            elif observation_type.lower() == "rgb_array":
+                env = RGBImgObsWrapper(env, tile_size=tile_size_px)
+                env = ImgObsWrapper(env)
 
+            # initialize model
+            try:
+                if algo.lower() == "dqn":
+                    model = DQN(
+                        policy_type,
+                        env,
+                        **self.dqn_kwargs,
+                        tensorboard_log=log_directory \
+                            if log_directory is not None else None
+                    )
+                elif algo.lower() == "a2c":
+                    model = A2C(
+                        policy_type,
+                        env,
+                        **self.a2c_kwargs,
+                        tensorboard_log=log_directory \
+                            if log_directory is not None else None
+                    )
+            except (AttributeError, NameError) as e:
+                print(str(e))
+                print(
+                    "Try setting algorithm parameters with the \
+                    add_<a2c, dqn>_config() methods before running \
+                    an experiment."
+                )
 
-        # TODO Save run with seed as suffix
+            # learn model, save if necessary
+            model.learn(
+                total_timesteps,
+                tb_log_name=full_path_suffix + f"seed_{self.SEEDS[i]}"
+            )
 
-        
+            if save_model:
+                model.save(
+                    model_directory \
+                    + full_path_suffix \
+                    + f"seed_{self.SEEDS[i]}"
+                )
+
+            # explicitly remove model and environment
+            del model
+            del env
         
 
     @classmethod

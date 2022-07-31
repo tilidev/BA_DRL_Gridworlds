@@ -52,6 +52,8 @@ class GridworldExperiment:
         The kwargs should correspond to the DQN arguments. The environment is
         automatically added to the configuration.
         """
+        assert 'policy' not in kwargs, \
+            "Policy must be specified in run_experiment method"
         self.dqn_kwargs = kwargs
         self.dqn_config_name = config_name
 
@@ -62,6 +64,8 @@ class GridworldExperiment:
     ):
         """Configure the parameters that will be passed to the a2c algorithm
         """
+        assert 'policy' not in kwargs, \
+            "Policy must be specified in run_experiment method"
         self.a2c_kwargs = kwargs
         self.a2c_config_name = config_name
 
@@ -107,10 +111,12 @@ class GridworldExperiment:
             "Observations must conform to 'tensor' or 'rgb_array'"
         assert policy_type in ["MlpPolicy", "CnnPolicy"], \
             "policy_type must conform to types defined by stable baselines 3"
-        if policy_type == "CnnPolicy" \
-        and observation_type.lower() == "rgb_array":
+        if policy_type == "CnnPolicy":
+            assert observation_type.lower() == "rgb_array", \
+                "Cnn only works on Images"
             assert isinstance(tile_size_px, int), \
                 "Render size for tiles must be set when using rgb input to cnn"
+            
 
         try:
             if algo.lower() == "dqn":
@@ -132,6 +138,8 @@ class GridworldExperiment:
             full_path_suffix = \
                 self.experiment_id + "/" + obs_type_path + algo.lower() + \
                 "/" + algo_config_name + "/"
+        else:
+            full_path_suffix = ""
 
         for i in range(num_runs):
 
@@ -157,7 +165,7 @@ class GridworldExperiment:
                         env,
                         **self.dqn_kwargs,
                         tensorboard_log=log_directory \
-                            if log_directory is not None else None
+                            if save_log else None
                     )
                 elif algo.lower() == "a2c":
                     model = A2C(
@@ -165,7 +173,7 @@ class GridworldExperiment:
                         env,
                         **self.a2c_kwargs,
                         tensorboard_log=log_directory \
-                            if log_directory is not None else None
+                            if save_log else None
                     )
             except AttributeError as e:
                 print(
@@ -174,6 +182,8 @@ class GridworldExperiment:
                     + "an experiment.\n"
                 )
                 raise
+
+            print(f"Model device: {model.device}")
 
             # learn model, save if necessary
             model.learn(

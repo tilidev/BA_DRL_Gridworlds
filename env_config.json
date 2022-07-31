@@ -14,5 +14,69 @@
             "lava_reward" : -1
         },
         "show_agent_dir" : false
+    },
+    "exp_002" : {
+        "max_steps" : 150,
+        "slip_proba" : 0,
+        "wall_rebound" : true,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "show_agent_dir" : false
+    },
+    "exp_slip_1" : {
+        "max_steps" : 150,
+        "slip_proba" : 0.05,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "show_agent_dir" : false
+    },
+    "exp_slip_2" : {
+        "max_steps" : 150,
+        "slip_proba" : 0.1,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "show_agent_dir" : false
+    },
+    "exp_slip_3" : {
+        "max_steps" : 150,
+        "slip_proba" : 0.15,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "show_agent_dir" : false
     }
 }

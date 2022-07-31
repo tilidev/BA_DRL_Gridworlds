@@ -67,11 +67,12 @@ def test_experiment_config():
     load = GridworldExperiment.load_env_json_config
     exp : GridworldExperiment = load("env_config.json", "exp_001")
     exp.add_a2c_config("conf_1", verbose=1)
-    exp.add_dqn_config("conf_1", verbose=1)
+    exp.add_dqn_config("conf_1")
     exp.run_experiment(
         2,
         "dqn",
-        60_000
+        60_000,
+        save_log=False
     )
 
 

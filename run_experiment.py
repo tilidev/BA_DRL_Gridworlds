@@ -68,6 +68,11 @@ parser.add_argument(
 )
 # TODO should test both dqn and a2c on tensor and rgb output and rgb with cuda
 
+parser.add_argument(
+    '--force_cuda',
+    action='store_true',
+    help="Will enforce usage of cuda if possible, AssertionError if not"
+)
 
 # TODO provide argument to run a hyperparameter tuning and return the results
 
@@ -116,7 +121,8 @@ def exec_test_run():
         model_directory="test_model/",
         policy_type="CnnPolicy",
         observation_type="rgb_array",
-        tile_size_px=8
+        tile_size_px=8,
+        force_cuda=args.force_cuda
     )
     print("Executed dqn rgb_array observation run")
 
@@ -129,7 +135,8 @@ def exec_test_run():
         model_directory="test_model/",
         policy_type="CnnPolicy",
         observation_type="rgb_array",
-        tile_size_px=8
+        tile_size_px=8,
+        force_cuda=args.force_cuda
     )
     print("Executed a2c rgb_array observation run")
 

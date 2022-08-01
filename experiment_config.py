@@ -80,7 +80,8 @@ class GridworldExperiment:
         save_log: bool = True,
         log_directory: str = "saved_logs/",
         save_model: bool = True,
-        model_directory: str = "saved_models/"
+        model_directory: str = "saved_models/",
+        force_cuda: bool = False
     ):
         """Run the experiment with preset algorithm configurations for a
         certain number of runs. The path to the saved log and model are
@@ -99,6 +100,7 @@ class GridworldExperiment:
             log_directory (str, optional): The log folder (e.g. "saved_logs/")
             save_model (bool, optional): Whether to save the trained model
             model_directory (str, optional): The model folder ("saved_models/")
+            force_cuda (bool, optional): Force execution with cuda (else error)
         """    
 
 
@@ -183,7 +185,10 @@ class GridworldExperiment:
                 )
                 raise
 
+            # check model
             print(f"Model device: {model.device}")
+            if force_cuda and model.device.type != "cuda":
+                assert False, "Force Cuda execution but cuda not available"
 
             # learn model, save if necessary
             model.learn(

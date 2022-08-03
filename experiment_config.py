@@ -5,6 +5,9 @@ import stable_baselines3
 from stable_baselines3 import DQN, A2C
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.callbacks import StopTrainingOnRewardThreshold
+
+from callback import InfoCallback
 
 import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
@@ -81,7 +84,8 @@ class GridworldExperiment:
         log_directory: str = "saved_logs/",
         save_model: bool = True,
         model_directory: str = "saved_models/",
-        force_cuda: bool = False
+        force_cuda: bool = False,
+        callback: str = 'progress'
     ):
         """Run the experiment with preset algorithm configurations for a
         certain number of runs. The path to the saved log and model are
@@ -101,6 +105,7 @@ class GridworldExperiment:
             save_model (bool, optional): Whether to save the trained model
             model_directory (str, optional): The model folder ("saved_models/")
             force_cuda (bool, optional): Force execution with cuda (else error)
+            callback (str, optional): #TODO
         """    
 
 
@@ -118,6 +123,9 @@ class GridworldExperiment:
                 "Cnn only works on Images"
             assert isinstance(tile_size_px, int), \
                 "Render size for tiles must be set when using rgb input to cnn"
+        if callback is not None:
+            assert callback in ['progress', 'early_stop'], \
+                "Unknown callback. Please use one of the specified alternatives."
             
 
         try:
@@ -158,7 +166,7 @@ class GridworldExperiment:
                 env = RGBImgObsWrapper(env, tile_size=tile_size_px)
                 env = ImgObsWrapper(env)
             # env = Monitor(env, info_keywords=("is_success",))
-
+            
             # initialize model
             try:
                 if algo.lower() == "dqn":
@@ -190,10 +198,18 @@ class GridworldExperiment:
             if force_cuda and model.device.type != "cuda":
                 assert False, "Force Cuda execution but cuda not available"
 
+            # Initialize callback if provided
+            if callback == 'progress':
+                cb = InfoCallback(total_timesteps)
+            elif callback == 'early_stop':
+                cb = StopTrainingOnRewardThreshold() 
+                # TODO implement, and use EvalCallback for it to work
+
             # learn model, save if necessary
             model.learn(
                 total_timesteps,
-                tb_log_name=full_path_suffix + f"seed_{self.SEEDS[i]}"
+                tb_log_name=full_path_suffix + f"seed_{self.SEEDS[i]}",
+                callback=cb
             )
 
             if save_model:

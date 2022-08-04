@@ -214,7 +214,7 @@ class GridworldExperiment:
 
             print(f"Running experiment '{self.experiment_id}'")
             log_path = full_path_suffix + f"seed_{self.SEEDS[i]}" \
-                + "_directional" if directional_agent else ""
+                + ("_directional" if directional_agent else "")
             print(f"Saving tensorboard logs to: {log_path}")
 
             # learn model, save if necessary
@@ -228,7 +228,7 @@ class GridworldExperiment:
                 save_path = model_directory \
                     + full_path_suffix \
                     + f"seed_{self.SEEDS[i]}" \
-                    + "_directional" if directional_agent else ""
+                    + ("_directional" if directional_agent else "")
                 print(f"Saving trained model to: {save_path}")
                 model.save(save_path)
 

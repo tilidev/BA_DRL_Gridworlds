@@ -1,4 +1,9 @@
 {
     "dqn_low_eps" : {
+        "exploration_final_eps" : 0.01
+    },
+    "dqn_longer_low_eps" : {
+        "exploration_fraction" : 0.3,
+        "exploration_final_eps" : 0.01
     }
 }

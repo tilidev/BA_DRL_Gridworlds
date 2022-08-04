@@ -198,7 +198,7 @@ class GridworldExperiment:
                 raise
 
             # check model
-            print(f"Model device: {model.device}")
+            print(f"Pytorch device: {model.device}")
             if force_cuda and model.device.type != "cuda":
                 assert False, "Force Cuda execution but cuda not available"
 
@@ -212,19 +212,23 @@ class GridworldExperiment:
             else:
                 raise NotImplementedError()
 
+            print(f"Running experiment '{self.experiment_id}'")
+            log_path = full_path_suffix + f"seed_{self.SEEDS[i]}"
+            print(f"Saving tensorboard logs to: {log_path}")
+
             # learn model, save if necessary
             model.learn(
                 total_timesteps,
-                tb_log_name=full_path_suffix + f"seed_{self.SEEDS[i]}",
+                tb_log_name=log_path,
                 callback=cb
             )
 
             if save_model:
-                model.save(
-                    model_directory \
+                save_path = model_directory \
                     + full_path_suffix \
                     + f"seed_{self.SEEDS[i]}"
-                )
+                print(f"Saving trained model to: {save_path}")
+                model.save(save_path)
 
             # explicitly remove model and environment
             del model

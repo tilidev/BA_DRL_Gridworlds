@@ -34,6 +34,14 @@ parser.add_argument(
     help="The type of observations on which to run the experiments"
 )
 
+parser.add_argument(
+    '--tile_size_px',
+    type=int,
+    default=8,
+    choices=[8, 16, 32],
+    help="The pixel length and width for one tile. Only applies to rgb output"
+)
+
 #TODO implement
 parser.add_argument(
     '--directional_agent',
@@ -50,7 +58,7 @@ parser.add_argument(
 
 #TODO implement
 parser.add_argument(
-    '--no_model',
+    '--nomodel',
     action='store_true',
     help="Will not save the agent's model"
 )
@@ -114,7 +122,6 @@ def check_args(args: argparse.Namespace):
     # TODO check that environment config and algo config are legal
         # check that algo config does not conflict with tensor and rgb observation
         # It should be possible to set policy kwargs but not to set a custom policy class
-
     pass
 
 def exec_test_run():
@@ -203,21 +210,34 @@ def exec_experiments():
     exp.add_a2c_config(algo_config_name, **algo_config)
     exp.add_dqn_config(algo_config_name, **algo_config)
 
+    # Run experiments depending on algorithms and observation types
     if args.algo == 'all':
-        for name in ['dqn', 'a2c']:
+        algorithms = ('dqn', 'a2c')
+    else:
+        algorithms = (args.algo,)
+    if args.observations == 'all':
+        observation_types = ('tensor', 'rgb_array')
+    else:
+        observation_types = (args.observations,)
+    rgb_kwargs = {
+        "tile_size_px" : args.tile_size_px,
+        "policy_type" : "CnnPolicy",
+    }
+
+    for algo in algorithms:
+        for obs_type in observation_types:
             exp.run_experiment(
                 num_runs=args.num_runs,
-                algo=name,
+                algo=algo,
                 total_timesteps=args.num_timesteps,
-                # TODO NOT DONE --> Continue Here
+                observation_type=obs_type,
+                save_log=(not args.nolog),
+                save_model=(not args.nomodel),
+                force_cuda=args.force_cuda,
+                callback=args.callback,
+                directional_agent=args.directional_agent, # TODO test if naming can be differentiated
+                **(rgb_kwargs if obs_type == "rgb_array" else {})
             )
-    else:
-        exp.run_experiment(
-            num_runs=args.num_runs,
-            algo=args.algo,
-            total_timesteps=args.num_timesteps,
-            # NOT DONE
-        )
     
 
 if __name__ == "__main__":

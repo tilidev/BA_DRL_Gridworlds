@@ -80,6 +80,7 @@ class GridworldExperiment:
         observation_type : str = "tensor",
         policy_type : str = "MlpPolicy",
         tile_size_px: int = None,
+        directional_agent: bool = False,
         save_log: bool = True,
         log_directory: str = "saved_logs/",
         save_model: bool = True,
@@ -140,6 +141,9 @@ class GridworldExperiment:
                 + "an experiment.\n"
             )
             raise
+
+        # update env kwargs for agent directionality
+        self.env_kwargs.update({"show_agent_dir" : directional_agent})
 
         # define path for saving
         if save_log:
@@ -202,8 +206,11 @@ class GridworldExperiment:
             if callback == 'progress':
                 cb = InfoCallback(total_timesteps)
             elif callback == 'early_stop':
-                cb = StopTrainingOnRewardThreshold() 
+                raise NotImplementedError()
+                # cb = StopTrainingOnRewardThreshold()
                 # TODO implement, and use EvalCallback for it to work
+            else:
+                raise NotImplementedError()
 
             # learn model, save if necessary
             model.learn(

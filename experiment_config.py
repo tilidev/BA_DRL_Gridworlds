@@ -179,7 +179,8 @@ class GridworldExperiment:
                         env,
                         **self.dqn_kwargs,
                         tensorboard_log=log_directory \
-                            if save_log else None
+                            if save_log else None,
+                        seed=self.SEEDS[i]
                     )
                 elif algo.lower() == "a2c":
                     model = A2C(
@@ -187,8 +188,10 @@ class GridworldExperiment:
                         env,
                         **self.a2c_kwargs,
                         tensorboard_log=log_directory \
-                            if save_log else None
+                            if save_log else None,
+                        seed=self.SEEDS[i]
                     )
+                print("Model seed:", model.seed)
             except AttributeError as e:
                 print(
                     "\nWARNING: Try setting algorithm parameters with the " \

@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 
 from experiment_config import GridworldExperiment
 
@@ -248,6 +249,8 @@ def exec_experiments():
         "policy_type" : "CnnPolicy",
     }
 
+    training_start = round(time.time())
+    print("INFO: Starting training")
     for algo in algorithms:
         for obs_type in observation_types:
             exp.run_experiment(
@@ -262,6 +265,11 @@ def exec_experiments():
                 directional_agent=args.directional_agent,
                 **(rgb_kwargs if obs_type == "rgb_array" else {})
             )
+    training_exec_time = round(time.time()) - training_start
+
+    print(f"INFO: Training terminated after {training_exec_time} seconds")
+    underline_suffix = len(str(training_exec_time)) * "-"
+    print(f"----------------------------------------{underline_suffix}")
     
 
 if __name__ == "__main__":

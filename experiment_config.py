@@ -135,6 +135,7 @@ class GridworldExperiment:
             elif algo.lower() == "a2c":
                 algo_config_name = self.a2c_config_name
         except AttributeError as e:
+            # Attribute error raised when no algorithm configuration was passed
             print(
                 "\nWARNING: Try setting algorithm parameters with the " \
                 + "add_<a2c, dqn>_config() methods before running " \
@@ -218,7 +219,7 @@ class GridworldExperiment:
             print(f"Running experiment '{self.experiment_id}'")
             log_path = full_path_suffix + f"seed_{self.SEEDS[i]}" \
                 + ("_directional" if directional_agent else "")
-            print(f"Saving tensorboard logs to: {log_path}")
+            print(f"Saving tensorboard logs to: {log_directory+log_path}")
 
             # learn model, save if necessary
             model.learn(

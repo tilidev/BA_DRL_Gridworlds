@@ -7,8 +7,7 @@ parser = argparse.ArgumentParser(
     description="Run experiments specified by the experiment_config file"
 )
 
-# Per command, one experiment is executed
-#TODO implement
+# Per command, one experiment (environment configuration) is executed
 parser.add_argument(
     '--exp',
     type=str,
@@ -16,7 +15,6 @@ parser.add_argument(
     help="The json key in the experiment config for the environment parameters"
 )
 
-#TODO implement
 parser.add_argument(
     '--algo',
     type=str,
@@ -25,7 +23,6 @@ parser.add_argument(
     help="The algorithm with which to compute the experiment"
 )
 
-# TODO implement
 parser.add_argument(
     '--observations',
     type=str,
@@ -42,28 +39,24 @@ parser.add_argument(
     help="The pixel length and width for one tile. Only applies to rgb output"
 )
 
-#TODO implement
 parser.add_argument(
     '--directional_agent',
     action='store_true',
     help="Will render the agent facing in its intended direction"
 )
 
-#TODO implement
 parser.add_argument(
     '--nolog',
     action='store_true',
     help="Will not save the log file of the experiment"
 )
 
-#TODO implement
 parser.add_argument(
     '--nomodel',
     action='store_true',
     help="Will not save the agent's model"
 )
 
-#TODO implement
 parser.add_argument(
     '--num_timesteps',
     type=int,
@@ -71,7 +64,6 @@ parser.add_argument(
     help="The number of time steps for each run"
 )
 
-#TODO implement
 parser.add_argument(
     '--num_runs',
     type=int,
@@ -79,7 +71,6 @@ parser.add_argument(
     help="The number of model trainings per algorithm. Max is 10"
 )
 
-#TODO implement
 parser.add_argument(
     '--algo_config_key',
     type=str,
@@ -111,18 +102,51 @@ parser.add_argument(
 # TODO provide argument to run a hyperparameter tuning and return the results
 
 # NOTE optional: specify new directory for logs/models
-# NOTE optional: sequential vs parallel execution?
 # TODO NOTE optional: Callbacks hinzufügen (stop training, eval_callback etc.)
 
 
 def check_args(args: argparse.Namespace):
-    # TODO check that experiment exists
-    # TODO check that algo config can only be passed when only one algo is chosen
-    # TODO check that algo config key exists when passed
-    # TODO check that environment config and algo config are legal
-        # check that algo config does not conflict with tensor and rgb observation
-        # It should be possible to set policy kwargs but not to set a custom policy class
-    pass
+    # check environment configuration exists
+    with open('env_config.json', 'r') as f:
+        env_configurations = json.load(f)
+        assert args.exp in env_configurations, \
+            "Experiment was not found in env_config.json"
+        
+        # check env configuration does not conflict with later methods
+        assert 'show_agent_dir' not in env_configurations[args.exp], \
+            "Agent directionality should only be set in the " \
+            + "--directional_agent command line option"
+
+    # there should not be more runs than specified seeds
+    assert args.num_runs <= 10, \
+        "You should maximally schedule 10 runs"
+
+    # Check that algorithm configuration will only be applied to one algorithm
+    assert (args.algo_config_key is None) or (args.algo != 'all'), \
+        "--algo='all' is not allowed when an algorithm configuration is passed"
+    
+    # check that algo config key exists when passed
+    with open('algo_config.json', 'r') as f:
+        algo_configurations = json.load(f)
+        k = args.algo_config_key
+        if k is not None:
+            assert k in algo_configurations, \
+                "Algorithm configuration was not found in algo_config.json"
+
+            # prevent algo config conflict with tensor and rgb observation
+            assert 'policy' not in algo_configurations[k], \
+                "Policy is set depending on the --observations option" \
+                + " and should not be set in the algorithm configuration"
+            
+            assert 'seed' not in algo_configurations[k], \
+                "RNG seeds are set during execution and should not be passed"
+
+            assert 'device' not in algo_configurations[k], \
+                "Device is automatically set during execution. " \
+                + "The --force_cuda option can be used to ensure gpu execution"
+            
+            assert 'tensorboard_log' not in algo_configurations[k], \
+                "Tensorboard directory is set during script execution"
 
 def exec_test_run():
     # load experiment 1
@@ -235,7 +259,7 @@ def exec_experiments():
                 save_model=(not args.nomodel),
                 force_cuda=args.force_cuda,
                 callback=args.callback,
-                directional_agent=args.directional_agent, # TODO test if naming can be differentiated
+                directional_agent=args.directional_agent,
                 **(rgb_kwargs if obs_type == "rgb_array" else {})
             )
     

@@ -12,8 +12,7 @@
             "absorbing_reward_lava" : -1,
             "risky_tile_reward" : 0,
             "lava_reward" : -1
-        },
-        "show_agent_dir" : false
+        }
     },
     "exp_002" : {
         "max_steps" : 150,
@@ -28,8 +27,7 @@
             "absorbing_reward_lava" : -1,
             "risky_tile_reward" : 0,
             "lava_reward" : -1
-        },
-        "show_agent_dir" : false
+        }
     },
     "exp_slip_1" : {
         "max_steps" : 150,
@@ -44,8 +42,7 @@
             "absorbing_reward_lava" : -1,
             "risky_tile_reward" : 0,
             "lava_reward" : -1
-        },
-        "show_agent_dir" : false
+        }
     },
     "exp_slip_2" : {
         "max_steps" : 150,
@@ -60,8 +57,7 @@
             "absorbing_reward_lava" : -1,
             "risky_tile_reward" : 0,
             "lava_reward" : -1
-        },
-        "show_agent_dir" : false
+        }
     },
     "exp_slip_3" : {
         "max_steps" : 150,
@@ -76,7 +72,6 @@
             "absorbing_reward_lava" : -1,
             "risky_tile_reward" : 0,
             "lava_reward" : -1
-        },
-        "show_agent_dir" : false
+        }
     }
 }

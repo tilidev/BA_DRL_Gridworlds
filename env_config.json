@@ -73,5 +73,20 @@
             "risky_tile_reward" : 0,
             "lava_reward" : -1
         }
+    },
+    "exp_hard_001" : {
+        "max_steps" : 150,
+        "slip_proba" : 0.05,
+        "wall_rebound" : true,
+        "spiky_active" : true,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : -0.1,
+            "lava_reward" : -1
+        }
     }
 }

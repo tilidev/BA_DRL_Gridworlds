@@ -91,7 +91,6 @@ parser.add_argument(
     help="Will enforce usage of cuda if possible, AssertionError if not"
 )
 
-# TODO implement
 parser.add_argument(
     '--ignore_existing_logs',
     action='store_true',
@@ -106,6 +105,13 @@ parser.add_argument(
     default='progress',
     help="A callback to provide to model learning. " \
         + "Options are defined in experiment_config.py"
+)
+
+parser.add_argument(
+    '--job_name',
+    type=str,
+    default="unnamed",
+    help="Will be printed to stdout for easy identification of logs"
 )
 
 # TODO provide argument to run a hyperparameter tuning and return the results
@@ -223,6 +229,8 @@ def exec_test_run():
     print("Successfully executed runs!")
 
 def exec_experiments():
+
+    print(f"Job name: {args.job_name}")
     
     # Initialize experiment object with key parameter
     exp : GridworldExperiment = \

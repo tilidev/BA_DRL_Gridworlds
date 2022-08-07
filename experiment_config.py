@@ -186,17 +186,13 @@ class GridworldExperiment:
                                 + f" in directory {pth}."
                         )
                 # reduce list of seeds to be used
-                available_seeds = list(set(self.SEEDS).difference(seeds_w_log))
-                available_seeds = available_seeds[:num_runs]
+                available_seeds = [x for x in self.SEEDS if x not in seeds_w_log]
+                # available_seeds = list(set(self.SEEDS).difference(seeds_w_log))
         else:
             full_path_suffix = ""
 
-        for i in range(num_runs):
-
-            # TODO hier seed setzen
-            # skip seed if log already exists and logs shouldn't be ignored
-            if not ignore_logs and self.SEEDS[i] in seeds_w_log:
-                continue
+        available_seeds = available_seeds[:num_runs]
+        for s in available_seeds:
 
             # make environment
             env = gym.make(
@@ -221,7 +217,7 @@ class GridworldExperiment:
                         **self.dqn_kwargs,
                         tensorboard_log=log_directory \
                             if save_log else None,
-                        seed=self.SEEDS[i]
+                        seed=s
                     )
                 elif algo.lower() == "a2c":
                     model = A2C(
@@ -230,7 +226,7 @@ class GridworldExperiment:
                         **self.a2c_kwargs,
                         tensorboard_log=log_directory \
                             if save_log else None,
-                        seed=self.SEEDS[i]
+                        seed=s
                     )
                 print("Model seed:", model.seed)
             except AttributeError as e:
@@ -257,7 +253,7 @@ class GridworldExperiment:
                 raise NotImplementedError()
 
             print(f"Running experiment '{self.experiment_id}'")
-            log_path = full_path_suffix + f"seed_{self.SEEDS[i]}" \
+            log_path = full_path_suffix + f"seed_{s}" \
                 + ("_directional" if directional_agent else "")
             print(f"Saving tensorboard logs to: {log_directory+log_path}")
 
@@ -271,7 +267,7 @@ class GridworldExperiment:
             if save_model:
                 save_path = model_directory \
                     + full_path_suffix \
-                    + f"seed_{self.SEEDS[i]}" \
+                    + f"seed_{s}" \
                     + ("_directional" if directional_agent else "")
                 print(f"Saving trained model to: {save_path}")
                 model.save(save_path)

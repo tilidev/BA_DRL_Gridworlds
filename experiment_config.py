@@ -1,4 +1,5 @@
 import json
+import os
 
 import gym
 import stable_baselines3
@@ -71,6 +72,21 @@ class GridworldExperiment:
             "Policy must be specified in run_experiment method"
         self.a2c_kwargs = kwargs
         self.a2c_config_name = config_name
+    
+    def _check_existing_runs(self, log_path: str) -> list[int]:
+        """Will return a list for seeds for which there are already logs in
+        the given path. List is empty if there are no logs with the given seed.
+        """
+        res = []
+
+        if os.path.exists(log_path):
+            for seed in self.SEEDS:
+                for entry in os.listdir(log_path):
+                    # use _ to make sure seed is not itself in another seed
+                    if f"_{seed}_" in entry:
+                        res.append(seed)
+        
+        return res
 
     def run_experiment(
         self,
@@ -86,7 +102,8 @@ class GridworldExperiment:
         save_model: bool = True,
         model_directory: str = "saved_models/",
         force_cuda: bool = False,
-        callback: str = 'progress'
+        callback: str = 'progress',
+        ignore_logs: bool = False 
     ):
         """Run the experiment with preset algorithm configurations for a
         certain number of runs. The path to the saved log and model are
@@ -98,15 +115,16 @@ class GridworldExperiment:
             num_runs (int): Number of runs, should be maximally 10.
             algo (str): Either 'dqn' or 'a2c'
             total_timesteps (int): Number of timesteps to learn for each run
-            observation_type (str, optional): Either 'tensor' or 'rgb_array'
-            policy_type (str, optional): Either 'MlpPolicy' or 'CnnPolicy'
-            tile_size_px (int, optional): Set this render size for cnn policy
-            save_log (bool, optional): Whether to save a tensorboard log
-            log_directory (str, optional): The log folder (e.g. "saved_logs/")
-            save_model (bool, optional): Whether to save the trained model
-            model_directory (str, optional): The model folder ("saved_models/")
-            force_cuda (bool, optional): Force execution with cuda (else error)
-            callback (str, optional): #TODO
+            observation_type (str): Either 'tensor' or 'rgb_array'
+            policy_type (str): Either 'MlpPolicy' or 'CnnPolicy'
+            tile_size_px (int, optional): Set tile render size for cnn policy
+            save_log (bool): Whether to save a tensorboard log
+            log_directory (str): The log folder (e.g. "saved_logs/")
+            save_model (bool): Whether to save the trained model
+            model_directory (str): The model folder ("saved_models/")
+            force_cuda (bool): Force execution with cuda (else error)
+            callback (str): #TODO
+            ignore_logs (bool): Will still execute already existing runs
         """    
 
 
@@ -127,7 +145,6 @@ class GridworldExperiment:
         if callback is not None:
             assert callback in ['progress', 'early_stop'], \
                 "Unknown callback. Please use one of the specified alternatives."
-            
 
         try:
             if algo.lower() == "dqn":
@@ -146,6 +163,8 @@ class GridworldExperiment:
         # update env kwargs for agent directionality
         self.env_kwargs.update({"show_agent_dir" : directional_agent})
 
+        available_seeds = self.SEEDS
+
         # define path for saving
         if save_log:
             obs_type_path = "tensor_obs/" if observation_type == "tensor" \
@@ -153,10 +172,31 @@ class GridworldExperiment:
             full_path_suffix = \
                 self.experiment_id + "/" + obs_type_path + algo.lower() + \
                 "/" + algo_config_name + "/"
+            
+            if not ignore_logs:
+                # check for are already existing logs for certain seeds
+                pth = log_directory + full_path_suffix
+                seeds_w_log = self._check_existing_runs(pth)
+                if len(seeds_w_log) > 0:
+                    seed_enumeration = ", ".join([str(s) for s in seeds_w_log])
+                    print(f"Skipping seeds {seed_enumeration}")
+                    if len(seeds_w_log) == len(self.SEEDS):
+                        print(
+                            "WARNING: There are already runs for each seed" \
+                                + f" in directory {pth}."
+                        )
+                # reduce list of seeds to be used
+                available_seeds = list(set(self.SEEDS).difference(seeds_w_log))
+                available_seeds = available_seeds[:num_runs]
         else:
             full_path_suffix = ""
 
         for i in range(num_runs):
+
+            # TODO hier seed setzen
+            # skip seed if log already exists and logs shouldn't be ignored
+            if not ignore_logs and self.SEEDS[i] in seeds_w_log:
+                continue
 
             # make environment
             env = gym.make(

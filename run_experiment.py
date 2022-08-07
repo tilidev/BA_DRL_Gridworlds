@@ -93,6 +93,14 @@ parser.add_argument(
 
 # TODO implement
 parser.add_argument(
+    '--ignore_existing_logs',
+    action='store_true',
+    help="Will start runs with the first seed even" \
+        + " if corresponding logs already exists"
+)
+
+# TODO implement
+parser.add_argument(
     '--callback',
     type=str,
     default='progress',
@@ -263,6 +271,7 @@ def exec_experiments():
                 force_cuda=args.force_cuda,
                 callback=args.callback,
                 directional_agent=args.directional_agent,
+                ignore_logs=args.ignore_existing_logs,
                 **(rgb_kwargs if obs_type == "rgb_array" else {})
             )
     training_exec_time = round(time.time()) - training_start

@@ -7,8 +7,9 @@ import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
 
 from stable_baselines3.a2c import A2C
+from stable_baselines3.dqn import DQN
 
-from gym_minigrid.wrappers import TensorObsWrapper
+from gym_minigrid.wrappers import ImgObsWrapper, RGBImgObsWrapper, TensorObsWrapper
 
 parser = argparse.ArgumentParser(
     description="Script for evaluating and visualizing trained agents"
@@ -33,9 +34,14 @@ parser.add_argument(
 
 def visualize_agent_default(path):
     env = gym.make("MiniGrid-RiskyPath-v0")
-    env = TensorObsWrapper(env)
 
-    model = A2C.load(path)
+    # env = TensorObsWrapper(env)
+
+    env = RGBImgObsWrapper(env)
+    env = ImgObsWrapper(env)
+
+
+    model = DQN.load(path)
 
     for i in range(5):
         done = False

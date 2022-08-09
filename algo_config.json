@@ -5,5 +5,11 @@
     "dqn_longer_low_eps" : {
         "exploration_fraction" : 0.3,
         "exploration_final_eps" : 0.01
+    },
+    "dqn_slow_learning" : {
+        "learning_rate" : 0.00005,
+        "exploration_fraction" : 0.4,
+        "exploration_final_eps" : 0.005,
+        "gamma" : 1
     }
 }

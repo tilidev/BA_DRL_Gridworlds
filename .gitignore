@@ -9,3 +9,5 @@ test_model
 
 *pyc
 *egg-info
+
+.ipynb_*

@@ -11,5 +11,17 @@
         "exploration_fraction" : 0.4,
         "exploration_final_eps" : 0.005,
         "gamma" : 1
+    },
+    "a2c_entropy_1" : {
+        "ent_coef" : 0.2
+    },
+    "a2c_entropy_2" : {
+        "ent_coef" : 0.4
+    },
+    "a2c_val_entropy_1" : {
+        "vf_coef" : 0.3
+    },
+    "a2c_val_entropy_2" : {
+        "vf_coef" : 0.7
     }
 }

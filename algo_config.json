@@ -12,11 +12,25 @@
         "exploration_final_eps" : 0.005,
         "gamma" : 1
     },
+    "dqn_reduced_network_default" : {
+        "policy_kwargs" : {
+            "net_arch" : [64, 32]
+        }
+    },
     "a2c_entropy_1" : {
         "ent_coef" : 0.2
     },
     "a2c_entropy_2" : {
         "ent_coef" : 0.4
+    },
+    "a2c_entropy_3" : {
+        "ent_coef" : 0.025
+    },
+    "a2c_entropy_4" : {
+        "ent_coef" : 0.05
+    },
+    "a2c_entropy_5" : {
+        "ent_coef" : 0.1
     },
     "a2c_val_entropy_1" : {
         "vf_coef" : 0.3

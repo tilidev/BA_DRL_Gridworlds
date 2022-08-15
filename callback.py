@@ -24,7 +24,11 @@ class InfoCallback(BaseCallback):
             progress_percent = round((calls / self.total_steps) * 100, 2)
             print(f"Training progress for this run: {progress_percent}%")
             print(f"Current time step: {calls}")
-            exec_time = time.time() - self.start_time
-            print(f"Execution time since run start: {round(exec_time)} seconds\n")
+            exec_time = round(time.time() - self.start_time)
+            print(f"Execution time since run start: {exec_time} seconds\n")
         
         return True
+
+class EarlyStoppingCallback(BaseCallback):
+    # TODO implement
+    pass

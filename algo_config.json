@@ -32,6 +32,9 @@
     "a2c_entropy_5" : {
         "ent_coef" : 0.1
     },
+    "a2c_entropy_6" : {
+        "ent_coef" : 0.0125
+    },
     "a2c_val_entropy_1" : {
         "vf_coef" : 0.3
     },

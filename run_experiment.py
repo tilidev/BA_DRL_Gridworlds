@@ -114,14 +114,13 @@ parser.add_argument(
     help="Will be printed to stdout for easy identification of logs"
 )
 
-# TODO implement
 parser.add_argument(
-    '--IM_config_key',
+    '--im_config_key',
     type=str,
     default=None,
     help="Will wrap the environment in an intrinsic motivation " \
-        + "rewards wrapper. The configuration key with corresponding " + \
-        + "values must be included in the file im_config.json"
+        + "rewards wrapper. The configuration key with corresponding " \
+        + "values must be included in the file 'im_config.json'"
 )
 
 # TODO provide argument to run a hyperparameter tuning and return the results
@@ -260,6 +259,12 @@ def exec_experiments():
     # (no config can be passed when using both algorithms)
     exp.add_a2c_config(algo_config_name, **algo_config)
     exp.add_dqn_config(algo_config_name, **algo_config)
+    
+    if args.im_config_key is not None:
+        with open('im_config.json', 'r') as im_file:
+            deserialized = json.load(im_file)
+            im_config = deserialized[args.im_config_key]
+            exp.add_im_config(args.im_config_key, **im_config)
 
     # Run experiments depending on algorithms and observation types
     if args.algo == 'all':

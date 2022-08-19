@@ -1,0 +1,7 @@
+{
+    "no_extrinsic_10" : {
+        "remove_extrinsic" : true,
+        "stop_after_n_steps" : null,
+        "stop_after_progress" : 0.1
+    }
+}

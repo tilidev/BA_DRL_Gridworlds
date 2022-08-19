@@ -14,6 +14,7 @@ import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
 from gym_minigrid.envs.risky import DEFAULT_REWARDS
 from gym_minigrid.wrappers import ImgObsWrapper, RGBImgObsWrapper, TensorObsWrapper
+from special_wrappers import IntrinsicMotivationWrapper
 
 
 class GridworldExperiment:
@@ -72,6 +73,19 @@ class GridworldExperiment:
             "Policy must be specified in run_experiment method"
         self.a2c_kwargs = kwargs
         self.a2c_config_name = config_name
+
+    def add_im_config(
+        self,
+        config_name : str,
+        **kwargs
+    ):
+        """Configure parameters passed for Intrinsic Motivation wrapper
+        """
+        assert "total_steps" not in kwargs, \
+            "'total_steps' is automatically set during experiment execution"
+        self.im_config = True
+        self.im_config_name = config_name
+        self.im_kwargs = kwargs
     
     def _check_existing_runs(self, log_path: str) -> list[int]:
         """Will return a list for seeds for which there are already logs in
@@ -103,7 +117,7 @@ class GridworldExperiment:
         model_directory: str = "saved_models/",
         force_cuda: bool = False,
         callback: str = 'progress',
-        ignore_logs: bool = False 
+        ignore_logs: bool = False
     ):
         """Run the experiment with preset algorithm configurations for a
         certain number of runs. The path to the saved log and model are
@@ -172,6 +186,9 @@ class GridworldExperiment:
             full_path_suffix = \
                 self.experiment_id + "/" + obs_type_path + algo.lower() + \
                 "/" + algo_config_name + "/"
+
+            if self.im_config:
+                full_path_suffix += self.im_config_name + "/"
             
             if not ignore_logs:
                 # check for are already existing logs for certain seeds
@@ -207,6 +224,13 @@ class GridworldExperiment:
                 env = RGBImgObsWrapper(env, tile_size=tile_size_px)
                 env = ImgObsWrapper(env)
             # env = Monitor(env, info_keywords=("is_success",))
+
+            if self.im_config:
+                env = IntrinsicMotivationWrapper(
+                    env,
+                    total_timesteps,
+                    **self.im_kwargs
+                )
             
             # initialize model
             try:

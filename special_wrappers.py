@@ -24,10 +24,10 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
 
         Args:
             env: The wrapped environment (TensorObsWrapper)
-            total_steps (int): _description_
+            total_steps (int): the amount of steps used for learning
             remove_extrinsic (bool): whether to return only intrinsic rewards
-            stop_after_n_steps (Optional[int], optional): _description_
-            stop_after_progress (Optional[float]): _description_
+            stop_after_n_steps (Optional[int]): number of pretraining steps
+            stop_after_progress (Optional[float]): percentage of pretraining
         """    
         # NOTE
         # CAREFUL, at the moment the environment must first be wrapped by
@@ -89,7 +89,6 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
 
         # compute empirical state-count reward bonus
         reward_bonus = 1 / math.sqrt(self.state_count_map[current_state_n])
-        print(current_state_n)
         modified_reward = reward_bonus if self.remove_extrinsic \
             else extrinsic_reward + reward_bonus
 

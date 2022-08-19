@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# file taken from gym-minigrid @ Farama-Foundation
+# file taken from gym-minigrid @ Farama-Foundation and slightly modified
 
 import time
 import argparse
@@ -10,6 +10,7 @@ import gym_minigrid
 from gym_minigrid.envs.risky import ABSORBING_REWARD_GOAL, ABSORBING_REWARD_LAVA, ABSORBING_STATES, GOAL_REWARD, LAVA_REWARD, SPIKY_TILE_REWARD, STEP_PENALTY, RiskyPathEnv
 from gym_minigrid.wrappers import *
 from gym_minigrid.window import Window
+from special_wrappers import IntrinsicMotivationWrapper
 
 is_RiskyPathEnv = False
 
@@ -117,7 +118,7 @@ parser.add_argument(
 parser.add_argument(
     '--agent_view',
     default=False,
-    help="draw the agent sees (partially observable view)",
+    help="draw what the agent sees (partially observable view)",
     action='store_true'
 )
 
@@ -146,10 +147,14 @@ parser.add_argument(
     help="Whether or not the direction of the agent is to be shown",
     action="store_true"
 )
+parser.add_argument(
+    "--wrap_IM",
+    help="Will wrap environment with the 'IntrinsicMotivationWrapper'",
+    action='store_true'
+)
 
 
 args = parser.parse_args()
-
 
 
 reward_model= {
@@ -176,6 +181,10 @@ is_RiskyPathEnv = True if "RiskyPath" in args.env else False
 if args.agent_view:
     env = RGBImgPartialObsWrapper(env)
     env = ImgObsWrapper(env)
+
+if args.wrap_IM:
+    env = TensorObsWrapper(env)
+    env = IntrinsicMotivationWrapper(env, 100, stop_after_n_steps=30)
 
 window = Window('gym_minigrid - ' + args.env)
 window.reg_key_handler(key_handler)

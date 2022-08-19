@@ -114,6 +114,16 @@ parser.add_argument(
     help="Will be printed to stdout for easy identification of logs"
 )
 
+# TODO implement
+parser.add_argument(
+    '--IM_config_key',
+    type=str,
+    default=None,
+    help="Will wrap the environment in an intrinsic motivation " \
+        + "rewards wrapper. The configuration key with corresponding " + \
+        + "values must be included in the file im_config.json"
+)
+
 # TODO provide argument to run a hyperparameter tuning and return the results
 
 # NOTE optional: specify new directory for logs/models

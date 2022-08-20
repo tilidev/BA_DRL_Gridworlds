@@ -145,3 +145,7 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
                 else:
                     out_text += f" [{n}]"
         print(out_text + "\n")
+
+
+class ShiftingEnvironmentWrapper(gym.Wrapper):
+    pass

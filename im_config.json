@@ -3,5 +3,10 @@
         "remove_extrinsic" : true,
         "stop_after_n_steps" : null,
         "stop_after_progress" : 0.1
+    },
+    "no_extrinsic_25" : {
+        "remove_extrinsic" : true,
+        "stop_after_n_steps" : null,
+        "stop_after_progress" : 0.25
     }
 }

@@ -6,6 +6,12 @@
         "exploration_fraction" : 0.3,
         "exploration_final_eps" : 0.01
     },
+    "dqn_IM" : {
+        "learning_starts" : 100,
+        "exploration_initial_eps" : 0.05,
+        "exploration_final_eps" : 0.01,
+        "exploration_fraction" : 0.05
+    },
     "dqn_slow_learning" : {
         "learning_rate" : 0.00005,
         "exploration_fraction" : 0.4,

@@ -44,6 +44,9 @@ class GridworldExperiment:
             spiky_positions (list[tuple]): the spiky tile positions
         """
         self.experiment_id = exp_id
+        
+        # fix experiment not working when no intrinsic motivation wrapping
+        self.im_config = False
 
         # environment spec
         self.env_kwargs = kwargs

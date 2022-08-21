@@ -8,5 +8,15 @@
         "remove_extrinsic" : true,
         "stop_after_n_steps" : null,
         "stop_after_progress" : 0.25
+    },
+    "intrinsic_bonus_10" : {
+        "remove_extrinsic" : false,
+        "stop_after_n_steps" : null,
+        "stop_after_progress" : 0.1
+    },
+    "intrinsic_bonus_25" : {
+        "remove_extrinsic" : false,
+        "stop_after_n_steps" : null,
+        "stop_after_progress" : 0.25
     }
 }

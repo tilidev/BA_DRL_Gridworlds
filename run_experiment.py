@@ -103,6 +103,7 @@ parser.add_argument(
     '--callback',
     type=str,
     default='progress',
+    choices=['progress', 'save_best'],
     help="A callback to provide to model learning. " \
         + "Options are defined in experiment_config.py"
 )
@@ -126,7 +127,7 @@ parser.add_argument(
 # TODO provide argument to run a hyperparameter tuning and return the results
 
 # NOTE optional: specify new directory for logs/models
-# TODO NOTE optional: Callbacks hinzufügen (stop training, eval_callback etc.)
+
 
 
 def check_args(args: argparse.Namespace):

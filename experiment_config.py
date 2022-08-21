@@ -6,7 +6,9 @@ import stable_baselines3
 from stable_baselines3 import DQN, A2C
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import StopTrainingOnRewardThreshold
+from stable_baselines3.common.callbacks import EvalCallback
+from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
+from stable_baselines3.common.vec_env.vec_transpose import VecTransposeImage
 
 from callback import InfoCallback
 
@@ -159,9 +161,6 @@ class GridworldExperiment:
                 "Cnn only works on Images"
             assert isinstance(tile_size_px, int), \
                 "Render size for tiles must be set when using rgb input to cnn"
-        if callback is not None:
-            assert callback in ['progress', 'early_stop'], \
-                "Unknown callback. Please use one of the specified alternatives."
 
         try:
             if algo.lower() == "dqn":
@@ -220,12 +219,25 @@ class GridworldExperiment:
                 **self.env_kwargs
             )
 
+            eval_env = gym.make(
+                "MiniGrid-RiskyPath-v0",
+                **self.env_kwargs
+            )
+
             # wrap environment according to observation type
             if observation_type.lower() == "tensor":
                 env = TensorObsWrapper(env)
+                eval_env = TensorObsWrapper(eval_env)
             elif observation_type.lower() == "rgb_array":
                 env = RGBImgObsWrapper(env, tile_size=tile_size_px)
+                eval_env = RGBImgObsWrapper(eval_env, tile_size=tile_size_px)
                 env = ImgObsWrapper(env)
+                eval_env = ImgObsWrapper(eval_env)
+
+                # apply same wrapping as base_algorithm for rgb inputs
+                # eval_env must be VecTransposeImage
+                eval_env = DummyVecEnv([lambda: eval_env])
+                eval_env = VecTransposeImage(eval_env)
             # env = Monitor(env, info_keywords=("is_success",))
 
             if self.im_config:
@@ -269,19 +281,31 @@ class GridworldExperiment:
             if force_cuda and model.device.type != "cuda":
                 assert False, "Force Cuda execution but cuda not available"
 
+            # save paths
+            log_path = full_path_suffix + f"seed_{s}" \
+                + ("_directional" if directional_agent else "")
+
+            save_path_model = model_directory \
+                + full_path_suffix \
+                + f"seed_{s}" \
+                + ("_directional" if directional_agent else "")
+
             # Initialize callback if provided
             if callback == 'progress':
                 cb = InfoCallback(total_timesteps)
-            elif callback == 'early_stop':
-                raise NotImplementedError()
-                # cb = StopTrainingOnRewardThreshold()
-                # TODO implement, and use EvalCallback for it to work
+            elif callback == 'save_best':
+                cb = [
+                    EvalCallback(
+                        eval_env=eval_env,
+                        log_path=log_directory + log_path + "_evals",
+                        best_model_save_path=save_path_model + "_best_model"
+                    ),
+                    InfoCallback(total_timesteps)
+                ]
             else:
                 raise NotImplementedError()
 
             print(f"Running experiment '{self.experiment_id}'")
-            log_path = full_path_suffix + f"seed_{s}" \
-                + ("_directional" if directional_agent else "")
             print(f"Saving tensorboard logs to: {log_directory+log_path}")
 
             # learn model, save if necessary
@@ -292,12 +316,8 @@ class GridworldExperiment:
             )
 
             if save_model:
-                save_path = model_directory \
-                    + full_path_suffix \
-                    + f"seed_{s}" \
-                    + ("_directional" if directional_agent else "")
-                print(f"Saving trained model to: {save_path}")
-                model.save(save_path)
+                print(f"Saving trained model to: {save_path_model}")
+                model.save(save_path_model)
 
             # explicitly remove model and environment
             del model

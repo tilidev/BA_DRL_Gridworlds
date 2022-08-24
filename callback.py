@@ -28,7 +28,3 @@ class InfoCallback(BaseCallback):
             print(f"Execution time since run start: {exec_time} seconds\n")
         
         return True
-
-class EarlyStoppingCallback(BaseCallback):
-    # TODO implement
-    pass

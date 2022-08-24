@@ -2,11 +2,11 @@ from collections import defaultdict
 import math
 from typing import Optional
 import gym
-import numpy as np
+from gym.utils import seeding
+from gym_minigrid.envs.risky import RiskyPathEnv
 
 from gym_minigrid.wrappers import TensorObsWrapper
-# TODO Random Network Destillation IM wrapper(especially for rgb inputs)
-# TODO Distributional Shift & Goal Misgeneralization Wrapper
+# NOTE implement "Random Network Destillation" IM wrapper (for rgb inputs)
 
 class IntrinsicMotivationWrapper(gym.Wrapper):
     def __init__(
@@ -56,7 +56,7 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
         self.learning_total_steps = total_steps
         self.remove_extrinsic = remove_extrinsic
         self.current_step = 0
-        self.state_count_map = defaultdict(int)
+        self.state_count_map = defaultdict(int) # do not rename
 
 
     def step(self, action):
@@ -111,7 +111,7 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
             return obs, modified_reward, done, info
 
 
-    def _map_pos_to_number(self, pos: tuple):
+    def _map_pos_to_number(self, pos: tuple) -> int:
         """Hash a RiskyGridworld state into a number.
         This hash function is naive and expects stationary lava and goal
         tiles. The function only takes the agent's position as the hash
@@ -147,5 +147,71 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
         print(out_text + "\n")
 
 
-class ShiftingEnvironmentWrapper(gym.Wrapper):
-    pass
+class RandomizeGoalWrapper(gym.Wrapper):
+    def __init__(self, env, randomization: float = 0.02):
+        """Creates a self-shifting environment for training agent robustness
+        and avoid goal misgeneralization. Will randomize placement of
+        reward-inducing tiles. This wrapper should not be applied with the
+        intrinsic reward wrapper, as it assumes a stationary state distribution
+        being dependent only on the agent's position.
+
+        Args:
+            env: the environment to be randomized
+            randomization: The ratio of episodes with randomization
+        """        
+        assert isinstance(env.unwrapped, RiskyPathEnv), \
+            "Must be RiskyPathEnv"
+        assert 0 < randomization <= 1, \
+            "Randomization factor must be in interval (0,1]"
+        assert not hasattr(env, "state_count_map"), \
+            "Should not apply this wrapper with Intrinsic Motivation wrapper"
+        
+        self.randomization = randomization
+
+        # get originial goal positions (shallow copy)
+        self._original_goal_positions = env.goal_positions.copy()
+
+        # set available tiles for random goal placement
+        self._reserved_positions = []
+        self._reserved_positions.extend(env.lava_positions)
+        self._reserved_positions.append(tuple(env.agent_start_pos))
+
+        self.is_modified = False
+        super().__init__(env)
+
+    def reset(self):
+        if self.env.np_random.random() < self.randomization:
+            # set new environment goal tiles
+            # Access must be to unwrapped env due to the way gym.Wrapper works
+            setattr(self.env.unwrapped, 'goal_positions', self._generate_new_goals())
+            self.is_modified = True
+            print("modified")
+            return self.env.reset()
+        elif self.is_modified:
+            self.env.unwrapped.goal_positions = self._original_goal_positions
+            self.is_modified = False
+
+        return super().reset()
+    
+    def step(self, action):
+        return super().step(action)
+    
+    def _generate_new_goals(self):
+        width, height = self.env.width, self.env.height
+        all_positions = [] # fill with positions inside walls
+        for i in range(1, width - 1):
+            all_positions.extend([(i, j) for j in range(1, height - 1)])
+        reserved_positions = self._reserved_positions.copy()
+        for p in reserved_positions:
+            all_positions.remove(p)
+
+        goal_count = len(self._original_goal_positions)
+        new_positions = []
+        for _ in range(goal_count):
+            new_goal_idx = self.env.np_random.choice(len(all_positions))
+            new_goal = all_positions[new_goal_idx]
+            assert new_goal not in reserved_positions
+            all_positions.pop(new_goal_idx)
+            new_positions.append(new_goal)
+
+        return new_positions

@@ -16,7 +16,7 @@ import gym_minigrid
 from gym_minigrid.envs import RiskyPathEnv
 from gym_minigrid.envs.risky import DEFAULT_REWARDS
 from gym_minigrid.wrappers import ImgObsWrapper, RGBImgObsWrapper, TensorObsWrapper
-from special_wrappers import IntrinsicMotivationWrapper
+from special_wrappers import IntrinsicMotivationWrapper, RandomizeGoalWrapper
 
 
 class GridworldExperiment:
@@ -49,6 +49,11 @@ class GridworldExperiment:
         
         # fix experiment not working when no intrinsic motivation wrapping
         self.im_config = False
+
+        # set goal-tile placement randomization
+        self.goal_rnd = None
+        if 'goal_rnd' in kwargs:
+            self.goal_rnd = kwargs.pop('goal_rnd')
 
         # environment spec
         self.env_kwargs = kwargs
@@ -240,12 +245,17 @@ class GridworldExperiment:
                 eval_env = VecTransposeImage(eval_env)
             # env = Monitor(env, info_keywords=("is_success",))
 
+            # NOTE EvalEnv only evaluates performance on the original environment
             if self.im_config:
                 env = IntrinsicMotivationWrapper(
                     env,
                     total_timesteps,
                     **self.im_kwargs
                 )
+
+            if self.goal_rnd is not None:
+                env = RandomizeGoalWrapper(env, randomization=self.goal_rnd)
+                # TODO evaluate eval_env on best model with RandomizeGoalWrapper
             
             # initialize model
             try:

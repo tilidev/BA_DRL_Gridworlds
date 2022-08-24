@@ -10,7 +10,7 @@ import gym_minigrid
 from gym_minigrid.envs.risky import ABSORBING_REWARD_GOAL, ABSORBING_REWARD_LAVA, ABSORBING_STATES, GOAL_REWARD, LAVA_REWARD, SPIKY_TILE_REWARD, STEP_PENALTY, RiskyPathEnv
 from gym_minigrid.wrappers import *
 from gym_minigrid.window import Window
-from special_wrappers import IntrinsicMotivationWrapper
+from special_wrappers import IntrinsicMotivationWrapper, RandomizeGoalWrapper
 
 is_RiskyPathEnv = False
 
@@ -152,9 +152,11 @@ parser.add_argument(
     help="Will wrap environment with the 'IntrinsicMotivationWrapper'",
     action='store_true'
 )
-
-
-args = parser.parse_args()
+parser.add_argument(
+    "--wrap_randomize",
+    help="Will wrap environment with RandomizeGoalWrapper",
+    action='store_true'
+)
 
 
 reward_model= {
@@ -185,6 +187,9 @@ if args.agent_view:
 if args.wrap_IM:
     env = TensorObsWrapper(env)
     env = IntrinsicMotivationWrapper(env, 100, stop_after_n_steps=30)
+
+if args.wrap_randomize:
+    env = RandomizeGoalWrapper(env, randomization=0.5)
 
 window = Window('gym_minigrid - ' + args.env)
 window.reg_key_handler(key_handler)

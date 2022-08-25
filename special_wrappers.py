@@ -1,9 +1,12 @@
 from collections import defaultdict
 import math
-from typing import Optional
+from typing import Optional, Union
 import gym
 from gym.utils import seeding
 from gym_minigrid.envs.risky import RiskyPathEnv
+
+from stable_baselines3.common.vec_env.vec_transpose import VecTransposeImage
+from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
 
 from gym_minigrid.wrappers import TensorObsWrapper
 # NOTE implement "Random Network Destillation" IM wrapper (for rgb inputs)
@@ -148,7 +151,12 @@ class IntrinsicMotivationWrapper(gym.Wrapper):
 
 
 class RandomizeGoalWrapper(gym.Wrapper):
-    def __init__(self, env, randomization: float = 0.02):
+    def __init__(
+        self,
+        env,
+        randomization: float = 0.02,
+        eval_mode: bool = False
+    ):
         """Creates a self-shifting environment for training agent robustness
         and avoid goal misgeneralization. Will randomize placement of
         reward-inducing tiles. This wrapper should not be applied with the
@@ -158,7 +166,12 @@ class RandomizeGoalWrapper(gym.Wrapper):
         Args:
             env: the environment to be randomized
             randomization: The ratio of episodes with randomization
-        """        
+            eval_mode: evaluate agent on hand-picked goal locations
+        """
+        if isinstance(env, VecTransposeImage):
+            # access the VecEnv's underlying true environment
+            env = env.envs[0]
+
         assert isinstance(env.unwrapped, RiskyPathEnv), \
             "Must be RiskyPathEnv"
         assert 0 < randomization <= 1, \
@@ -166,6 +179,10 @@ class RandomizeGoalWrapper(gym.Wrapper):
         assert not hasattr(env, "state_count_map"), \
             "Should not apply this wrapper with Intrinsic Motivation wrapper"
         
+        self.is_eval = eval_mode
+        if self.is_eval:
+            self.eval_idx = 0
+            self.eval_goals = [(1,3), (3,5), (7,5), (9,9), (9,1), (5,8)]
         self.randomization = randomization
 
         # get originial goal positions (shallow copy)
@@ -180,12 +197,23 @@ class RandomizeGoalWrapper(gym.Wrapper):
         super().__init__(env)
 
     def reset(self):
-        if self.env.np_random.random() < self.randomization:
+        if self.is_eval:
+            setattr(
+                self.env.unwrapped,
+                'goal_positions',
+                [self.eval_goals[self.eval_idx]]
+            )
+            l = len(self.eval_goals) - 1
+            self.eval_idx = self.eval_idx + 1 if self.eval_idx < l else 0
+        elif self.env.np_random.random() < self.randomization:
             # set new environment goal tiles
             # Access must be to unwrapped env due to the way gym.Wrapper works
-            setattr(self.env.unwrapped, 'goal_positions', self._generate_new_goals())
+            setattr(
+                self.env.unwrapped,
+                'goal_positions',
+                self._generate_new_goals()
+            )
             self.is_modified = True
-            print("modified")
             return self.env.reset()
         elif self.is_modified:
             self.env.unwrapped.goal_positions = self._original_goal_positions

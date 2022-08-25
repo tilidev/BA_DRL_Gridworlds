@@ -245,7 +245,7 @@ class GridworldExperiment:
                 eval_env = VecTransposeImage(eval_env)
             # env = Monitor(env, info_keywords=("is_success",))
 
-            # NOTE EvalEnv only evaluates performance on the original environment
+            # NOTE EvalEnv only evaluates performance on the basic environment
             if self.im_config:
                 env = IntrinsicMotivationWrapper(
                     env,
@@ -254,8 +254,14 @@ class GridworldExperiment:
                 )
 
             if self.goal_rnd is not None:
-                env = RandomizeGoalWrapper(env, randomization=self.goal_rnd)
-                # TODO evaluate eval_env on best model with RandomizeGoalWrapper
+                env = RandomizeGoalWrapper(
+                    env,
+                    randomization=self.goal_rnd
+                )
+                eval_env = RandomizeGoalWrapper(
+                    eval_env,
+                    eval_mode=True
+                )
             
             # initialize model
             try:
@@ -308,7 +314,8 @@ class GridworldExperiment:
                     EvalCallback(
                         eval_env=eval_env,
                         log_path=log_directory + log_path + "_evals",
-                        best_model_save_path=save_path_model + "_best_model"
+                        best_model_save_path=save_path_model + "_best_model",
+                        n_eval_episodes=6 # dependent on GoalRandomization
                     ),
                     InfoCallback(total_timesteps)
                 ]

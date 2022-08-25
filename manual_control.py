@@ -157,7 +157,11 @@ parser.add_argument(
     help="Will wrap environment with RandomizeGoalWrapper",
     action='store_true'
 )
-
+parser.add_argument(
+    "--test_eval_randomizer",
+    help="wrap env on the hard-coded goal randomization",
+    action='store_true'
+)
 
 reward_model= {
     STEP_PENALTY : 0,
@@ -168,6 +172,8 @@ reward_model= {
     SPIKY_TILE_REWARD : 0,
     LAVA_REWARD : -1
 }
+
+args = parser.parse_args()
 
 env = gym.make(
     args.env,
@@ -190,6 +196,9 @@ if args.wrap_IM:
 
 if args.wrap_randomize:
     env = RandomizeGoalWrapper(env, randomization=0.5)
+
+if args.test_eval_randomizer:
+    env = RandomizeGoalWrapper(env, eval_mode=True)
 
 window = Window('gym_minigrid - ' + args.env)
 window.reg_key_handler(key_handler)

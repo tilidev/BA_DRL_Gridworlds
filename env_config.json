@@ -30,6 +30,22 @@
         },
         "goal_rnd" : 0.02
     },
+    "exp_001_goal_rnd_5" : {
+        "max_steps" : 150,
+        "slip_proba" : 0,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "goal_rnd" : 0.05
+    },
     "exp_002" : {
         "max_steps" : 150,
         "slip_proba" : 0,

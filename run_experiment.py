@@ -173,6 +173,12 @@ def check_args(args: argparse.Namespace):
             assert 'tensorboard_log' not in algo_configurations[k], \
                 "Tensorboard directory is set during script execution"
 
+    # check that rgb_array observations are not used with eval_env
+    # TODO fix this issue (somehow not same wrapping)
+    assert not (args.observations == 'rgb_array') or \
+        args.callback != 'save_best', \
+            "save_best-callback & rgb-observations are currently not supported"
+
 def exec_test_run():
     # load experiment 1
     exp: GridworldExperiment = \
@@ -306,6 +312,8 @@ def exec_experiments():
     
 
 if __name__ == "__main__":
+    # arguments for debugging application
+    # debug_args = "".split()
     args = parser.parse_args()
 
     check_args(args)

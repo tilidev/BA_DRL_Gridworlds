@@ -46,6 +46,70 @@
         },
         "goal_rnd" : 0.05
     },
+    "exp_001_goal_rnd_7" : {
+        "max_steps" : 150,
+        "slip_proba" : 0,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "goal_rnd" : 0.075
+    },
+    "exp_001_goal_rnd_10" : {
+        "max_steps" : 150,
+        "slip_proba" : 0,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "goal_rnd" : 0.1
+    },
+    "exp_001_goal_rnd_15" : {
+        "max_steps" : 150,
+        "slip_proba" : 0,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "goal_rnd" : 0.15
+    },
+    "exp_001_goal_rnd_20" : {
+        "max_steps" : 150,
+        "slip_proba" : 0,
+        "wall_rebound" : false,
+        "spiky_active" : false,
+        "reward_spec" : {
+            "step_penalty" : 0,
+            "goal_reward" : 1,
+            "absorbing_states" : false,
+            "absorbing_reward_goal" : 0,
+            "absorbing_reward_lava" : -1,
+            "risky_tile_reward" : 0,
+            "lava_reward" : -1
+        },
+        "goal_rnd" : 0.2
+    },
     "exp_002" : {
         "max_steps" : 150,
         "slip_proba" : 0,

@@ -225,7 +225,7 @@ class RiskyPathSolver:
 
                     action = int(model.predict(obs, deterministic=True)[0])
                     policy_dict[(x, y)] = action
-                else: policy_dict[(x, y)] = 1 # action does not matter, just to fill a value
+                else: policy_dict[(x, y)] = 0 # action does not matter, just to fill a value
         return policy_dict, cls(second_env)
 
     def evaluate_policy(self, policy_dict, threshold=1e-10, beautify=1e-4):
@@ -331,7 +331,6 @@ class RiskyPathSolver:
         while not policy_stable:
             policy_stable = True
             value = self.evaluate_policy(policy)
-            print(value[(2,9)])
             for state in policy:
                 maximizing_action = _argmax_action(state)
                 if maximizing_action is not None:

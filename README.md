@@ -52,21 +52,81 @@ For both approaches, all required dependencies should be automatically installed
 
 ### Test Experiment
 
-To see if all works as expected, execute the following command:
+To see if all works as expected, execute the following commands in the repository's directory:
 
-- [ ] INSERT COMMAND HERE
+To begin with, play an episode of the default gridworld configuration by using the arrow keys and navigate to the green goal tile. 
+(Rendering is done with matplotlib, skip this step if executing on a headleass/remote server)
 
+```sh
+python manual_control.py
+```
+
+Now, check whether training script execution works with the installed packages:
+
+```sh
+python run_experiment.py --algo a2c --observations tensor --num_runs 1 --num_timesteps 75000
+```
+
+This script trains a DRL model with A2C on a default configuration (`exp_001`) of the gridworld as specified below.
 After execution finishes, two folder should have been created: `saved_logs` and `saved_models`. The saved tensorboard log can be analyzed in your browser as such:
 
-- [ ] INSERT TENSORBOARD HERE
+```sh
+tensorboard --logdir saved_logs
+```
 
-Check the trained model (visually):
+To observe the trained model's behavior, copy the following text into a python file (in the repo's folder) and execute it:
 
-- [ ] INSERT COMMAND WITH SEVERAL EPISODES HERE
+```python
+import json
+import time
+import gym
+from stable_baselines3 import A2C
+import gym_minigrid
+from gym_minigrid.wrappers import TensorObsWrapper
 
-or
+def model_env_from_path(agent_path: str, no_slip: bool = True, no_rebound: bool = True):
+    model = A2C.load(agent_path)
+    path_keys = agent_path.split("saved_models/")[1].split("/")
+    env_name = path_keys[0]
+    render_size = 8
+    with open('env_config.json', 'r') as f:
+        env_kwargs = json.load(f)[env_name]
+    env = gym.make(
+        "MiniGrid-RiskyPath-v0",
+        **env_kwargs
+    )
+    return model, env, render_size
 
-- [ ] INSERT COMMAND WITH SEVERAL RENDERED EPISODES HERE
+def test_agent_on_environment(
+    agent_path: str,
+    render_time: float = 0.2
+):
+    model, env, render_size = model_env_from_path(agent_path)
+    env = TensorObsWrapper(env)
+    for i in range(3):
+        print(f"Starting episode {i+1}")
+        total_reward = 0
+        needed_timesteps = 0
+        obs = env.reset()
+        done = False
+        env.render(tile_size=render_size)
+        time.sleep(render_time)
+        while not done:
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, done, _ = env.step(action)
+            env.render(tile_size=render_size)
+            total_reward += reward
+            needed_timesteps += 1
+            if needed_timesteps > 15:
+                render_time = 0.03
+            time.sleep(render_time)
+        print(f"Episode ended after {needed_timesteps} time steps.")
+        out = f"Total reward: {total_reward}"
+        print(out)
+        print("-"*len(out))
+
+test_agent_on_environment("saved_models/exp_001/tensor_obs/a2c/algo_default/seed_763")
+```
 
 **Caution:** The trained model is not expected to solve the environment satisfactorily as this should only be a test of whether the scripts execute as expected.
 

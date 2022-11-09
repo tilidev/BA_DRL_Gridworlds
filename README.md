@@ -56,7 +56,7 @@ For both approaches, all required dependencies should be automatically installed
 
 ### Test Experiment
 
-To see if everything works as expected, execute the following commands in the repository's directory.
+To see if everything works as expected, execute the following commands in the repository's directory (Make sure to load the contents of the submodule with `git submodule update` as this steps does not always happen automatically).
 
 To begin with, play an episode of the default gridworld configuration by using the arrow keys and navigate to the green goal tile. 
 (Rendering is done with matplotlib, skip this step if executing on a headleass/remote server)

@@ -1,5 +1,9 @@
 # BA_Deep_Reinforcement_Learning
 
+**INFO:** This repository has just been made public to allow access. The documentation and README have not been finalized yet and are subjet to major revisions.
+
+---
+
 - [ ] Introduction here
 
 ## Quick Start

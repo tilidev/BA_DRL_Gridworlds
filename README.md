@@ -4,7 +4,7 @@
 
 ## Quick Start
 
-- [ ] Installation steps & tested versions
+- [x] Installation steps & tested versions
 - [ ] Give different possibilites of using this repo:
     - [ ] Explain how to use the trained models
     - [ ] Explain how to follow the exact steps I made
@@ -52,7 +52,7 @@ For both approaches, all required dependencies should be automatically installed
 
 ### Test Experiment
 
-To see if all works as expected, execute the following commands in the repository's directory:
+To see if everything works as expected, execute the following commands in the repository's directory.
 
 To begin with, play an episode of the default gridworld configuration by using the arrow keys and navigate to the green goal tile. 
 (Rendering is done with matplotlib, skip this step if executing on a headleass/remote server)
@@ -128,7 +128,7 @@ def test_agent_on_environment(
 test_agent_on_environment("saved_models/exp_001/tensor_obs/a2c/algo_default/seed_763")
 ```
 
-**Caution:** The trained model is not expected to solve the environment satisfactorily as this should only be a test of whether the scripts execute as expected.
+> **Caution:** The trained model is not expected to solve the environment satisfactorily as this should only be a test of whether the scripts execute as expected.
 
 ## Repository - Quick Overview
 
@@ -175,8 +175,6 @@ The fork is referenced as a submodule in this repository, in order to keep the e
 - `plots.ipynb`: TODO
 
 ## Experiment Structure
-
-This 
 
 - [ ] Explain how I structured my experiments and describe them
 

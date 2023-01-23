@@ -46,5 +46,11 @@
     },
     "a2c_val_entropy_2" : {
         "vf_coef" : 0.7
+    },
+    "a2c_entropy_7" : {
+        "ent_coef" : 0.00625
+    },
+    "a2c_entropy_8" : {
+        "ent_coef" : 0.003125
     }
 }
